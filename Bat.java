@@ -9,23 +9,23 @@ public class Bat implements MouseMotionListener, KeyListener {
   class MoveThread extends Thread {
     @Override
     public void run() {
-      
+
       while (true) {
-        
+
         if (Bat.this.getMoved() == true) {
           if (Bat.this.direct == Bat.LEFT) {
-            Bat.this.left -= 8;
+            Bat.this.left -= Bat.OFFSET;
             if (Bat.this.left <= 0)
               Bat.this.left = 0;
           } else if (Bat.this.direct == Bat.RIGTH) {
-            Bat.this.left += 8;
-            if (Bat.this.left >= 820)
-              Bat.this.left = 820;
+            Bat.this.left += Bat.OFFSET;
+            if (Bat.this.left >= Bat.LIMITATION)
+              Bat.this.left = Bat.LIMITATION;
           }
         }
         try {
           Thread.sleep(10);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException exception) {
         }
       }
     }
@@ -33,6 +33,10 @@ public class Bat implements MouseMotionListener, KeyListener {
 
   private static final int LEFT = -1;
   private static final int RIGTH = 1;
+  private static final int LIMITATION = 820;
+  private static final int LEFTARROW = 37;
+  private static final int RIGHTARROW = 39;
+  private static final int OFFSET = 8;
   private boolean isMoved;
   private int direct;
 
@@ -60,11 +64,11 @@ public class Bat implements MouseMotionListener, KeyListener {
 
   @Override
   public void keyPressed(KeyEvent ke) {
-    if (ke.getKeyCode() == 37) {
+    if (ke.getKeyCode() == LEFTARROW) {
       if (this.getMoved() == false)
         this.setMoved(true);
       this.direct = Bat.LEFT;
-    } else if (ke.getKeyCode() == 39) {
+    } else if (ke.getKeyCode() == RIGHTARROW) {
       if (this.getMoved() == false)
         this.setMoved(true);
       this.direct = Bat.RIGTH;
@@ -73,7 +77,7 @@ public class Bat implements MouseMotionListener, KeyListener {
 
   @Override
   public void keyReleased(KeyEvent ke) {
-    if (ke.getKeyCode() == 37 || ke.getKeyCode() == 39) {
+    if (ke.getKeyCode() == LEFTARROW || ke.getKeyCode() == RIGHTARROW) {
       if (this.getMoved() == true)
         this.setMoved(false);
     }
@@ -116,6 +120,7 @@ public class Bat implements MouseMotionListener, KeyListener {
   public void setWidth(int w) {
     this.width = w;
   }
+
   public void setDir(int dir) {
     this.direct = dir;
   }

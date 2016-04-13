@@ -18,56 +18,46 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
   private final Bat Bat = new Bat();
   private int numBlocks;
   private int numRows;
-
-  State state;
+  private State state;
   private BufferedImage image;
-  private BufferedImage backGround;
+  private BufferedImage background;
   private boolean winner = false;
   private boolean dead = false;
-  private boolean avto = false ;
-  private final int iFramex;
-  private final int iFramey;
-  private final int iFrameh;
-  private final int iFramew;
+  private boolean auto = false;
+  private final int IFRAMEX = 100;
+  private final int IFRAMEY = 100;
+  private final int IFRAMEH = 500;
+  private final int IFRAMEW = 850;
 
   public Thread gameThread = null;
 
   public JavaArkanoidPanel() {
-    this.iFramex = 100;
-    this.iFramey = 100;
-    this.iFrameh = 500;
-    this.iFramew = 850;
-
     this.addMouseMotionListener(this.Bat);
 
-    state = State.Game;
+    setState(State.Game);
   }
 
   /**
    * main cycle
    */
-  // @Override
+  @Override
   public void run() {
     while (true) {
       this.Ball.move(this.getiFramew(), this.getiFrameh());
-     
+
       this.gameOver();
       if (this.dead == true) {
-        
         repaint();
-       
         break;
-      } 
-      else {
-        
-        avtoMode(avto);
+      } else {
+        autoMode(auto);
         this.collisionCheck();
         repaint();
         try {
           Thread.sleep(8);
-        } catch (Exception ex) {
-          System.out.println(ex.getMessage());
-          
+        } catch (Exception exception) {
+          System.out.println(exception.getMessage());
+
         }
       }
     }
@@ -77,41 +67,42 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
    * Visualization of the game
    */
   @Override
-  public void paint(Graphics g) {
+  public void paint(Graphics graphics) {
     if (this.winner == true) {
-      g.setColor(Color.WHITE);
-      g.fillRect(0, 0, this.getiFramew(), this.getiFrameh());
-      g.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 50));
-      g.setColor(Color.BLACK);
-      g.drawString("ПОБЕДА!", 80, 200);
-      g.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 20));
-      g.drawString("click to restart", 80, 300);
-      
+      graphics.setColor(Color.WHITE);
+      graphics.fillRect(0, 0, this.getiFramew(), this.getiFrameh());
+      graphics.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 50));
+      graphics.setColor(Color.BLACK);
+      graphics.drawString("ПОБЕДА!", 80, 200);
+      graphics.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 20));
+      graphics.drawString("click to restart", 80, 300);
+
     } else if (this.dead == true) {
-      g.setColor(Color.WHITE);
-      g.fillRect(0, 0, this.getiFramew(), this.getiFrameh());
-      g.setColor(Color.BLACK);
-      g.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 50));
-      g.drawString("ПОРАЖЕНИЕ", 80, 200);
-      g.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 20));
-      g.drawString("click to restart", 80, 300);
-      
+      graphics.setColor(Color.WHITE);
+      graphics.fillRect(0, 0, this.getiFramew(), this.getiFrameh());
+      graphics.setColor(Color.BLACK);
+      graphics.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 50));
+      graphics.drawString("ПОРАЖЕНИЕ", 80, 200);
+      graphics.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 20));
+      graphics.drawString("click to restart", 80, 300);
+
     } else {
-      Graphics b = this.image.getGraphics();
-  
-      b.drawImage(backGround, 0, 0, this.getiFramew(), this.getiFrameh(), null);
-      b.setColor(Color.RED);
+      Graphics graphicsBall = this.image.getGraphics();
 
-      this.Ball.paint(b);
+      graphicsBall.drawImage(background, 0, 0, this.getiFramew(), this.getiFrameh(), null);
+      graphicsBall.setColor(Color.RED);
 
-      b.setColor(Color.YELLOW);
+      this.Ball.paint(graphicsBall);
+
+      graphicsBall.setColor(Color.YELLOW);
       for (int i = 0; i < this.Bricks.size(); i++) {
         Rectangle rect = (Rectangle) this.Bricks.get(i);
-        b.fillRect(rect.x, rect.y, rect.width, rect.height);
+        graphicsBall.fillRect(rect.x, rect.y, rect.width, rect.height);
       }
-      b.setColor(Color.GREEN);
-      b.fillRect(this.Bat.getLeft(), this.Bat.getTop(), this.Bat.getWidth(), this.Bat.getHeight());
-      g.drawImage(this.image, 0, 0, this);
+      graphicsBall.setColor(Color.GREEN);
+      graphicsBall.fillRect(this.Bat.getLeft(), this.Bat.getTop(), this.Bat.getWidth(),
+          this.Bat.getHeight());
+      graphics.drawImage(this.image, 0, 0, this);
     }
   }
 
@@ -129,17 +120,16 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
     this.startBrick();
     this.startBat();
     this.Bat.setMoved(true);
-    
+
     this.startBall();
 
     this.image =
         new BufferedImage(this.getiFramew(), this.getiFrameh(), BufferedImage.TYPE_INT_RGB);
-    
+
     try {
-      this.backGround = ImageIO.read(new File("Space.jpg"));
-    } 
-    catch (IOException e) {
-      e.printStackTrace();
+      this.background = ImageIO.read(new File("Space.jpg"));
+    } catch (IOException exception) {
+      exception.printStackTrace();
     }
   }
 
@@ -206,58 +196,62 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
    */
   public void startBall() {
     repaint();
-    int speed=3;
-    if(state==State.Hard)
-    {
-      speed=speed*2;
+    int speed = 3;
+    if (getState() == State.Hard) {
+      speed = speed * 2;
     }
     this.Ball = new Ball(220, 380, 15, speed);
   }
-  
-  public void avtoMode(boolean A){
-    
-    if(A==true)
-    {
-      this.Bat.setMoved(true); 
-      
-      this.Bat.setDir( this.Ball.getDirX());
-      if(this.Bat.getLeft()==this.Ball.getX())
-      {
+
+  public void autoMode(boolean auto) {
+
+    if (auto == true) {
+      this.Bat.setMoved(true);
+
+      this.Bat.setDir(this.Ball.getDirX());
+      if (this.Bat.getLeft() == this.Ball.getX()) {
         this.Bat.setDir(0);
       }
-      if(this.Bat.getLeft()>=this.Ball.getX())
-      {
+      if (this.Bat.getLeft() >= this.Ball.getX()) {
         this.Bat.setDir(-1);
       }
-      if(this.Bat.getLeft()<=this.Ball.getX())
-      {
+      if (this.Bat.getLeft() <= this.Ball.getX()) {
         this.Bat.setDir(1);
       }
-    }
-    else this.Bat.setMoved(false);
-    
+    } else
+      this.Bat.setMoved(false);
+
   }
+
   public int getiFramex() {
-    return iFramex;
+    return IFRAMEX;
   }
 
   public int getiFramey() {
-    return iFramey;
+    return IFRAMEY;
   }
 
   public int getiFrameh() {
-    return iFrameh;
+    return IFRAMEH;
   }
 
   public int getiFramew() {
-    return iFramew;
+    return IFRAMEW;
   }
 
   public Bat getBat() {
     return this.Bat;
   }
-  
-  public void setAvtoMode(boolean A ){
-    this.avto=A;
+
+  public void setAutoMode(boolean auto) {
+    this.auto = auto;
+  }
+
+  public State getState() {
+    return state;
+  }
+
+  public void setState(State state) {
+    this.state = state;
   }
 }

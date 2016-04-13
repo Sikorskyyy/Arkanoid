@@ -20,7 +20,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 enum State {
-  Game, Menu, Hard, Avto
+  Game, Menu, Hard, Auto
 }
 
 
@@ -28,115 +28,114 @@ public class JavaArkanoid {
 
   public static void main(String[] arg) {
 
-    final JFrame f = new JFrame();
-    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    
+    final JFrame frame = new JFrame();
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
     JPanel controlPanel = new JPanel();
-    
+
     final JavaArkanoidPanel arkanoidPanel = new JavaArkanoidPanel();
     arkanoidPanel.init();
-    
-    f.setBounds(arkanoidPanel.getiFramex(), arkanoidPanel.getiFramey(), arkanoidPanel.getiFramew(),
-        arkanoidPanel.getiFrameh());
 
-    f.setTitle("Click to start the game");
+    frame.setBounds(arkanoidPanel.getiFramex(), arkanoidPanel.getiFramey(),
+        arkanoidPanel.getiFramew(), arkanoidPanel.getiFrameh());
 
-    f.addKeyListener(arkanoidPanel.getBat());
+    frame.setTitle("Click to start the game");
+
+    frame.addKeyListener(arkanoidPanel.getBat());
 
     final MenuPanel menuPanel = new MenuPanel();
 
-    f.setBounds(arkanoidPanel.getiFramex(), arkanoidPanel.getiFramey(), arkanoidPanel.getiFramew(),
-        arkanoidPanel.getiFrameh());
+    frame.setBounds(arkanoidPanel.getiFramex(), arkanoidPanel.getiFramey(),
+        arkanoidPanel.getiFramew(), arkanoidPanel.getiFrameh());
 
-    CardLayout cl = new CardLayout();
+    CardLayout cardlayout = new CardLayout();
 
-    controlPanel.setLayout(cl);
+    controlPanel.setLayout(cardlayout);
     controlPanel.add(menuPanel, "menu");
     controlPanel.add(arkanoidPanel, "arkanoid");
 
-    cl.show(controlPanel, "menu");
+    cardlayout.show(controlPanel, "menu");
 
-    JMenuBar menu = new JMenuBar();
-    f.setJMenuBar(menu);
-    JMenu mnGame = new JMenu("back to the menu?");
-    menu.add(mnGame);
+    JMenuBar menuBar = new JMenuBar();
+    frame.setJMenuBar(menuBar);
+    JMenu menu = new JMenu("back to the menu?");
+    menuBar.add(menu);
     JMenuItem mniStart = new JMenuItem("Yes");
     mniStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
     mniStart.addActionListener(new ActionListener() {
-      
+
       @Override
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent event) {
         menuPanel.setState(State.Menu);
         arkanoidPanel.init();
         arkanoidPanel.repaint();
       }
     });
-    
-    mnGame.add(mniStart);
-      
+
+    menu.add(mniStart);
+
     arkanoidPanel.addMouseListener(new MouseListener() {
 
       @Override
       public void mouseClicked(MouseEvent arg0) {
-        
-          arkanoidPanel.init();
-          arkanoidPanel.gameThread.start();
+
+        arkanoidPanel.init();
+        arkanoidPanel.gameThread.start();
       }
+
       @Override
       public void mouseEntered(MouseEvent arg0) {}
-      
+
       @Override
       public void mouseExited(MouseEvent arg0) {}
-  
+
       @Override
       public void mousePressed(MouseEvent arg0) {}
-       
+
       @Override
       public void mouseReleased(MouseEvent arg0) {}
-       
-  });
 
-    f.add(controlPanel);
+    });
+
+    frame.add(controlPanel);
 
     while (true) {
 
-      f.setVisible(true);
+      frame.setVisible(true);
       try {
         Thread.sleep(500);
       } catch (InterruptedException ie) {
       }
-    
+
       if (menuPanel.getState() == State.Game) {
-        cl.show(controlPanel, "arkanoid");
-       
-        f.setVisible(true);
-        arkanoidPanel.state=State.Game;
-        arkanoidPanel.setAvtoMode(false);
+        cardlayout.show(controlPanel, "arkanoid");
+
+        frame.setVisible(true);
+        arkanoidPanel.setState(State.Game);
+        arkanoidPanel.setAutoMode(false);
         arkanoidPanel.setFocusable(true);
 
       }
       if (menuPanel.getState() == State.Hard) {
-        cl.show(controlPanel, "arkanoid");
-        arkanoidPanel.state=State.Hard;
-        arkanoidPanel.setAvtoMode(false);
+        cardlayout.show(controlPanel, "arkanoid");
+        arkanoidPanel.setState(State.Hard);
+        arkanoidPanel.setAutoMode(false);
         arkanoidPanel.setFocusable(true);
-        f.setVisible(true);
+        frame.setVisible(true);
       }
       if (menuPanel.getState() == State.Menu) {
-        cl.show(controlPanel, "menu");
+        cardlayout.show(controlPanel, "menu");
         menuPanel.setFocusable(false);
-        f.setVisible(true);
+        frame.setVisible(true);
       }
-      if (menuPanel.getState() == State.Avto) {
-        cl.show(controlPanel, "arkanoid");
-        arkanoidPanel.setAvtoMode(true);
-        f.setVisible(true);
+      if (menuPanel.getState() == State.Auto) {
+        cardlayout.show(controlPanel, "arkanoid");
+        arkanoidPanel.setAutoMode(true);
+        frame.setVisible(true);
       }
-     
-      f.setVisible(true);
+
+      frame.setVisible(true);
     }
 
   }
 }
-
-
