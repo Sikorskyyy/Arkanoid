@@ -34,7 +34,7 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
   public JavaArkanoidPanel() {
     this.addMouseMotionListener(this.Bat);
 
-    setState(State.Game);
+    setState(State.GAME);
   }
 
   /**
@@ -197,7 +197,7 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
   public void startBall() {
     repaint();
     int speed = 3;
-    if (getState() == State.Hard) {
+    if (getState() == State.HARD) {
       speed = speed * 2;
     }
     this.Ball = new Ball(220, 380, 15, speed);

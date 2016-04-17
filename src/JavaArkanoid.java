@@ -20,7 +20,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 enum State {
-  Game, Menu, Hard, Auto
+  GAME, MENU, HARD, AUTO
 }
 
 
@@ -66,7 +66,7 @@ public class JavaArkanoid {
 
       @Override
       public void actionPerformed(ActionEvent event) {
-        menuPanel.setState(State.Menu);
+        menuPanel.setState(State.MENU);
         arkanoidPanel.init();
         arkanoidPanel.repaint();
       }
@@ -107,28 +107,28 @@ public class JavaArkanoid {
       } catch (InterruptedException ie) {
       }
 
-      if (menuPanel.getState() == State.Game) {
+      if (menuPanel.getState() == State.GAME) {
         cardlayout.show(controlPanel, "arkanoid");
 
         frame.setVisible(true);
-        arkanoidPanel.setState(State.Game);
+        arkanoidPanel.setState(State.GAME);
         arkanoidPanel.setAutoMode(false);
         arkanoidPanel.setFocusable(true);
 
       }
-      if (menuPanel.getState() == State.Hard) {
+      if (menuPanel.getState() == State.HARD) {
         cardlayout.show(controlPanel, "arkanoid");
-        arkanoidPanel.setState(State.Hard);
+        arkanoidPanel.setState(State.HARD);
         arkanoidPanel.setAutoMode(false);
         arkanoidPanel.setFocusable(true);
         frame.setVisible(true);
       }
-      if (menuPanel.getState() == State.Menu) {
+      if (menuPanel.getState() == State.MENU) {
         cardlayout.show(controlPanel, "menu");
         menuPanel.setFocusable(false);
         frame.setVisible(true);
       }
-      if (menuPanel.getState() == State.Auto) {
+      if (menuPanel.getState() == State.AUTO) {
         cardlayout.show(controlPanel, "arkanoid");
         arkanoidPanel.setAutoMode(true);
         frame.setVisible(true);

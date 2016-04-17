@@ -32,13 +32,13 @@ public class Ball {
     g.fillOval(this.positionX, this.positionY, this.SIZE, this.SIZE);
   }
 
-  public void move(int Wdt, int Hgt) {
+  public void move(int wdt, int hgt) {
     this.positionX = this.positionX + this.SPEED * this.dirX;
     this.positionY = this.positionY + this.SPEED * this.dirY;
 
     if (this.positionX < 0) {
       this.dirX = 1;
-    } else if (positionX > Wdt) {
+    } else if (positionX > wdt) {
       this.dirX = -1;
     }
 

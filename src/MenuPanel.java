@@ -30,7 +30,7 @@ public class MenuPanel extends JPanel {
 
     setLayout(null);
 
-    state = State.Menu;
+    state = State.MENU;
 
     try {
       this.background = ImageIO.read(new File("Menu.jpg"));
@@ -107,15 +107,15 @@ public class MenuPanel extends JPanel {
     public void actionPerformed(ActionEvent event) {
 
       if (event.getSource() == hard) {
-        state = State.Hard;
+        state = State.HARD;
       }
 
       if (event.getSource() == normal) {
-        state = State.Game;
+        state = State.GAME;
 
       }
       if (event.getSource() == auto) {
-        state = State.Auto;
+        state = State.AUTO;
 
       }
 
