@@ -8,7 +8,7 @@ import java.awt.event.MouseMotionListener;
 public class Bat implements MouseMotionListener, KeyListener {
   private static final int LEFT = -1;
   private static final int RIGTH = 1;
-  private static final int LIMITATION = 820;
+  private static final int LIMITATION = 725;
   private static final int LEFTARROW = 37;
   private static final int RIGHTARROW = 39;
   private static final int OFFSET = 8;
@@ -53,11 +53,17 @@ public class Bat implements MouseMotionListener, KeyListener {
   @Override
   public void mouseMoved(MouseEvent e) {
     this.left = e.getX();
+    if (Bat.this.left >= Bat.LIMITATION){
+      Bat.this.left = Bat.LIMITATION;
+    }
   }
 
   @Override
   public void mouseDragged(MouseEvent e) {
     this.left = e.getX();
+    if (Bat.this.left >= Bat.LIMITATION){
+      Bat.this.left = Bat.LIMITATION;
+    }
   }
 
   @Override

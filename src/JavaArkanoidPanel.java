@@ -1,5 +1,7 @@
 package javaarkanoid;
 
+import replay.Replay;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-class JavaArkanoidPanel extends JPanel implements Runnable {
+public class JavaArkanoidPanel extends JPanel implements Runnable {
   private ArrayList<Rectangle> Bricks;
   private Ball Ball;
   private final Bat Bat = new Bat();
@@ -29,6 +31,9 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
   private final int IFRAMEH = 500;
   private final int IFRAMEW = 850;
 
+  private Replay replay;
+  private boolean isReplay = false;
+
   public Thread gameThread = null;
 
   public JavaArkanoidPanel() {
@@ -42,15 +47,28 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
    */
   @Override
   public void run() {
+    if (isReplay == true) {
+      try {
+        replay.readFromFile();
+      } catch (ClassNotFoundException | IOException e) {
+        e.printStackTrace();
+      }
+    }
+
     while (true) {
-      this.Ball.move(this.getiFramew(), this.getiFrameh());
 
       this.gameOver();
-      if (this.dead == true) {
+      if (this.dead == true || this.winner == true) {
         repaint();
         break;
       } else {
-        autoMode(auto);
+        if (this.isReplay == true) {
+          replay.startReplay();
+        } else {
+          autoMode(auto);
+          this.Ball.move(this.getiFramew(), this.getiFrameh());
+          replay.addState(this.Bat.getLeft(), this.Ball.getPosX(), this.Ball.getPosY());
+        }
         this.collisionCheck();
         repaint();
         try {
@@ -63,7 +81,7 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
     }
   }
 
-  /*
+  /**
    * Visualization of the game
    */
   @Override
@@ -123,6 +141,10 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
 
     this.startBall();
 
+    replay = new Replay();
+    replay.setGame(this);
+    isReplay = false;
+
     this.image =
         new BufferedImage(this.getiFramew(), this.getiFrameh(), BufferedImage.TYPE_INT_RGB);
 
@@ -138,7 +160,8 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
    */
   public void collisionCheck() {
     Rectangle ballColl =
-        new Rectangle(this.Ball.getX(), this.Ball.getY(), this.Ball.getSize(), this.Ball.getSize());
+        new Rectangle(this.Ball.getPosX(), this.Ball.getPosY(), this.Ball.getSize(),
+            this.Ball.getSize());
     Rectangle xBatCrash =
         new Rectangle(this.Bat.getLeft(), this.Bat.getTop(), this.Bat.getWidth(),
             this.Bat.getHeight());
@@ -161,8 +184,27 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
   public void gameOver() {
     if (this.Bricks.isEmpty() == true) {
       this.winner = true;
-    } else if (this.Ball.getY() >= this.getiFrameh() - this.Ball.getSize()) {
+
+      try {
+        System.out.println("writing");
+        replay.writeToFile();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+      replay.stopReplay();
+
+    } else if (this.Ball.getPosY() >= this.getiFrameh() - this.Ball.getSize()) {
       this.dead = true;
+
+      try {
+        replay.writeToFile();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+
+      replay.stopReplay();
     }
   }
 
@@ -204,22 +246,25 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
   }
 
   public void autoMode(boolean auto) {
-
     if (auto == true) {
-      this.Bat.setMoved(true);
 
-      this.Bat.setDir(this.Ball.getDirX());
-      if (this.Bat.getLeft() == this.Ball.getX()) {
-        this.Bat.setDir(0);
+      if (Math.random() * 19 <= 2) {
+        this.Bat.setMoved(true);
+
+        this.Bat.setDir(this.Ball.getDirX());
+        if (this.Bat.getLeft() == this.Ball.getPosX()) {
+          this.Bat.setDir(0);
+        }
+        if (this.Bat.getLeft() >= this.Ball.getPosX()) {
+          this.Bat.setDir(-1);
+        }
+        if (this.Bat.getLeft() <= this.Ball.getPosX()) {
+          this.Bat.setDir(1);
+        }
       }
-      if (this.Bat.getLeft() >= this.Ball.getX()) {
-        this.Bat.setDir(-1);
-      }
-      if (this.Bat.getLeft() <= this.Ball.getX()) {
-        this.Bat.setDir(1);
-      }
-    } else
+    } else {
       this.Bat.setMoved(false);
+    }
 
   }
 
@@ -243,6 +288,10 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
     return this.Bat;
   }
 
+  public Ball getBall() {
+    return this.Ball;
+  }
+
   public void setAutoMode(boolean auto) {
     this.auto = auto;
   }
@@ -253,5 +302,13 @@ class JavaArkanoidPanel extends JPanel implements Runnable {
 
   public void setState(State state) {
     this.state = state;
+  }
+
+  public boolean getIsReplay() {
+    return isReplay;
+  }
+
+  public void setIsReplay(boolean isReplay) {
+    this.isReplay = isReplay;
   }
 }

@@ -22,7 +22,7 @@ public class MenuPanel extends JPanel {
   private final int IFRAMEH = 500;
   private final int IFRAMEW = 850;
 
-  Butt butt = new Butt();
+  ButtonListener buttonListener = new ButtonListener();
 
   private BufferedImage background;
 
@@ -49,7 +49,7 @@ public class MenuPanel extends JPanel {
     normal.setBackground(Color.yellow);
     add(normal);
 
-    auto = new JButton("AvtoMode");
+    auto = new JButton("AutoMode");
     auto.setBounds(325, 300, 150, 30);
     auto.setBackground(Color.green);
     add(auto);
@@ -59,10 +59,10 @@ public class MenuPanel extends JPanel {
     exit.setBackground(Color.yellow);
     add(exit);
 
-    exit.addActionListener(butt);
-    auto.addActionListener(butt);
-    normal.addActionListener(butt);
-    hard.addActionListener(butt);
+    exit.addActionListener(buttonListener);
+    auto.addActionListener(buttonListener);
+    normal.addActionListener(buttonListener);
+    hard.addActionListener(buttonListener);
 
   }
 
@@ -102,27 +102,28 @@ public class MenuPanel extends JPanel {
     this.state = state;
   }
 
-  public class Butt extends KeyAdapter implements ActionListener {
+  public class ButtonListener extends KeyAdapter implements ActionListener {
 
     public void actionPerformed(ActionEvent event) {
+      synchronized (MenuPanel.this) {
+        MenuPanel.this.notify();
+        if (event.getSource() == hard) {
+          state = State.HARD;
+        }
 
-      if (event.getSource() == hard) {
-        state = State.HARD;
+        if (event.getSource() == normal) {
+          state = State.GAME;
+
+        }
+        if (event.getSource() == auto) {
+          state = State.AUTO;
+
+        }
+
+        if (event.getSource() == exit) {
+          System.exit(0);
+        }
       }
-
-      if (event.getSource() == normal) {
-        state = State.GAME;
-
-      }
-      if (event.getSource() == auto) {
-        state = State.AUTO;
-
-      }
-
-      if (event.getSource() == exit) {
-        System.exit(0);
-      }
-
     }
   }
 }

@@ -1,6 +1,7 @@
 package javaarkanoid;
 
 import java.awt.CardLayout;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import replay.Replay;
 
 enum State {
   GAME, MENU, HARD, AUTO
@@ -26,7 +28,7 @@ enum State {
 
 public class JavaArkanoid {
 
-  public static void main(String[] arg) {
+  public static void main(String[] arg) throws InterruptedException {
 
     final JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -58,27 +60,44 @@ public class JavaArkanoid {
 
     JMenuBar menuBar = new JMenuBar();
     frame.setJMenuBar(menuBar);
-    JMenu menu = new JMenu("back to the menu?");
+    JMenu menu = new JMenu("menu");
     menuBar.add(menu);
-    JMenuItem mniStart = new JMenuItem("Yes");
-    mniStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-    mniStart.addActionListener(new ActionListener() {
+
+    JMenuItem menuStart = new JMenuItem("back to the menu");
+    menuStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+    menuStart.addActionListener(new ActionListener() {
 
       @Override
       public void actionPerformed(ActionEvent event) {
-        menuPanel.setState(State.MENU);
-        arkanoidPanel.init();
-        arkanoidPanel.repaint();
+        synchronized (menuPanel) {
+          menuPanel.notify();
+          menuPanel.setState(State.MENU);
+          arkanoidPanel.init();
+          arkanoidPanel.repaint();
+        }
       }
     });
 
-    menu.add(mniStart);
+    menu.add(menuStart);
+
+    JMenuItem menuReplay = new JMenuItem("replay");
+    menuReplay.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
+    menuReplay.addActionListener(new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent event) {
+        arkanoidPanel.init();
+        arkanoidPanel.repaint();
+        arkanoidPanel.setIsReplay(true);
+        arkanoidPanel.gameThread.start();
+      }
+    });
+    menu.add(menuReplay);
 
     arkanoidPanel.addMouseListener(new MouseListener() {
 
       @Override
       public void mouseClicked(MouseEvent arg0) {
-
         arkanoidPanel.init();
         arkanoidPanel.gameThread.start();
       }
@@ -98,44 +117,42 @@ public class JavaArkanoid {
     });
 
     frame.add(controlPanel);
-
-    while (true) {
-
-      frame.setVisible(true);
-      try {
-        Thread.sleep(500);
-      } catch (InterruptedException ie) {
-      }
-
-      if (menuPanel.getState() == State.GAME) {
-        cardlayout.show(controlPanel, "arkanoid");
+    synchronized (menuPanel) {
+      while (true) {
 
         frame.setVisible(true);
-        arkanoidPanel.setState(State.GAME);
-        arkanoidPanel.setAutoMode(false);
-        arkanoidPanel.setFocusable(true);
 
-      }
-      if (menuPanel.getState() == State.HARD) {
-        cardlayout.show(controlPanel, "arkanoid");
-        arkanoidPanel.setState(State.HARD);
-        arkanoidPanel.setAutoMode(false);
-        arkanoidPanel.setFocusable(true);
+        if (menuPanel.getState() == State.GAME) {
+          cardlayout.show(controlPanel, "arkanoid");
+
+          frame.setVisible(true);
+          arkanoidPanel.setState(State.GAME);
+          arkanoidPanel.setAutoMode(false);
+          arkanoidPanel.setFocusable(true);
+
+        }
+        if (menuPanel.getState() == State.HARD) {
+          cardlayout.show(controlPanel, "arkanoid");
+          arkanoidPanel.setState(State.HARD);
+          arkanoidPanel.setAutoMode(false);
+          arkanoidPanel.setFocusable(true);
+          frame.setVisible(true);
+        }
+        if (menuPanel.getState() == State.MENU) {
+          cardlayout.show(controlPanel, "menu");
+          menuPanel.setFocusable(false);
+          frame.setVisible(true);
+        }
+        if (menuPanel.getState() == State.AUTO) {
+          cardlayout.show(controlPanel, "arkanoid");
+          arkanoidPanel.setAutoMode(true);
+          frame.setVisible(true);
+        }
+
         frame.setVisible(true);
-      }
-      if (menuPanel.getState() == State.MENU) {
-        cardlayout.show(controlPanel, "menu");
-        menuPanel.setFocusable(false);
-        frame.setVisible(true);
-      }
-      if (menuPanel.getState() == State.AUTO) {
-        cardlayout.show(controlPanel, "arkanoid");
-        arkanoidPanel.setAutoMode(true);
-        frame.setVisible(true);
+        menuPanel.wait();
       }
 
-      frame.setVisible(true);
     }
-
   }
 }
