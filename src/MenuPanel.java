@@ -49,7 +49,7 @@ public class MenuPanel extends JPanel {
     normal.setBackground(Color.yellow);
     add(normal);
 
-    auto = new JButton("AvtoMode");
+    auto = new JButton("AutoMode");
     auto.setBounds(325, 300, 150, 30);
     auto.setBackground(Color.green);
     add(auto);

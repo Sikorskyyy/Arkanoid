@@ -47,12 +47,20 @@ public class Ball {
     }
   }
 
-  public int getY() {
+  public int getPosY() {
     return this.positionY;
   }
 
-  public int getX() {
+  public void setPosY(int positionY) {
+    this.positionY = positionY;
+  }
+
+  public int getPosX() {
     return this.positionX;
+  }
+
+  public void setPosX(int positionX) {
+    this.positionX = positionX;
   }
 
   public int getSize() {
@@ -67,7 +75,11 @@ public class Ball {
     return this.dirY;
   }
 
-  public void setDirY(int dy) {
-    this.dirY = dy;
+  public void setDirY(int dirY) {
+    this.dirY = dirY;
+  }
+
+  public void setDirX(int dirX) {
+    this.dirX = dirX;
   }
 }

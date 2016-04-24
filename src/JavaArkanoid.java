@@ -1,6 +1,7 @@
 package javaarkanoid;
 
 import java.awt.CardLayout;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import replay.Replay;
 
 enum State {
   GAME, MENU, HARD, AUTO
@@ -58,11 +60,12 @@ public class JavaArkanoid {
 
     JMenuBar menuBar = new JMenuBar();
     frame.setJMenuBar(menuBar);
-    JMenu menu = new JMenu("back to the menu?");
+    JMenu menu = new JMenu("menu");
     menuBar.add(menu);
-    JMenuItem mniStart = new JMenuItem("Yes");
-    mniStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-    mniStart.addActionListener(new ActionListener() {
+
+    JMenuItem menuStart = new JMenuItem("back to the menu");
+    menuStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+    menuStart.addActionListener(new ActionListener() {
 
       @Override
       public void actionPerformed(ActionEvent event) {
@@ -72,13 +75,26 @@ public class JavaArkanoid {
       }
     });
 
-    menu.add(mniStart);
+    menu.add(menuStart);
+
+    JMenuItem menuReplay = new JMenuItem("replay");
+    menuReplay.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
+    menuReplay.addActionListener(new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent event) {
+        arkanoidPanel.init();
+        arkanoidPanel.repaint();
+        arkanoidPanel.setIsReplay(true);
+        arkanoidPanel.gameThread.start();
+      }
+    });
+    menu.add(menuReplay);
 
     arkanoidPanel.addMouseListener(new MouseListener() {
 
       @Override
       public void mouseClicked(MouseEvent arg0) {
-
         arkanoidPanel.init();
         arkanoidPanel.gameThread.start();
       }
